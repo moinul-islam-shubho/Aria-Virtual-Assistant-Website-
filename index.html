@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aria — Your Everyday AI Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --bg: #EDEBF7;
+            --bg-alt: #E1DDF5;
+            --surface: #FFFFFF;
+            --ink: #1B1330;
+            --ink-soft: #5A5475;
+            --accent: #5B5FEF;
+            --accent-ink: #FFFFFF;
+            --accent-2: #FF7A59;
+            --border: rgba(27, 19, 48, .12);
+            --shadow: 0 24px 48px -28px rgba(27, 19, 48, .35);
+            --radius: 20px;
+        }
+        
+        @media (prefers-color-scheme:dark) {
+             :root:not([data-theme="light"]) {
+                --bg: #140F26;
+                --bg-alt: #1C1533;
+                --surface: #1C1533;
+                --ink: #F1EEFB;
+                --ink-soft: #B6AFD8;
+                --accent: #8B8FFF;
+                --accent-2: #FF8F73;
+                --border: rgba(241, 238, 251, .14);
+                --shadow: 0 24px 48px -28px rgba(0, 0, 0, .7);
+            }
+        }
+        
+         :root[data-theme="dark"] {
+            --bg: #140F26;
+            --bg-alt: #1C1533;
+            --surface: #1C1533;
+            --ink: #F1EEFB;
+            --ink-soft: #B6AFD8;
+            --accent: #8B8FFF;
+            --accent-2: #FF8F73;
+            --border: rgba(241, 238, 251, .14);
+            --shadow: 0 24px 48px -28px rgba(0, 0, 0, .7);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        body {
+            background: var(--bg);
+            color: var(--ink);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            line-height: 1.55;
+            transition: background .35s ease, color .35s ease;
+            overflow-x: hidden;
+        }
+        
+        h1,
+        h2,
+        h3,
+        .disp {
+            font-family: 'Bricolage Grotesque', 'Inter', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        
+        a {
+            color: inherit;
+        }
+        
+        img {
+            max-width: 100%;
+        }
+        
+        .wrap {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        
+        section {
+            padding: 96px 0;
+        }
+        
+        @media(max-width:720px) {
+            section {
+                padding: 64px 0;
+            }
+        }
+        /* NAV */
+        
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            background: color-mix(in srgb, var(--bg) 82%, transparent);
+            border-bottom: 1px solid var(--border);
+        }
+        
+        nav.wrap {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 72px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 1.3rem;
+            font-weight: 800;
+        }
+        
+        .logo-dot {
+            width: 11px;
+            height: 11px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 20%, transparent);
+            animation: dotPulse 2.4s ease-in-out infinite;
+        }
+        
+        @keyframes dotPulse {
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 20%, transparent);
+            }
+            50% {
+                transform: scale(1.15);
+                box-shadow: 0 0 0 8px color-mix(in srgb, var(--accent) 12%, transparent);
+            }
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            align-items: center;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            position: relative;
+            font-size: .95rem;
+            font-weight: 500;
+            color: var(--ink-soft);
+            text-decoration: none;
+            transition: color .2s;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -4px;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width .25s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--ink);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .icon-btn {
+            border: 1px solid var(--border);
+            background: var(--surface);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: transform .2s;
+        }
+        
+        .icon-btn:hover {
+            transform: scale(1.06);
+        }
+        
+        .burger {
+            display: none;
+        }
+        
+        @media(max-width:780px) {
+            .nav-links {
+                position: fixed;
+                inset: 72px 0 auto 0;
+                background: var(--bg);
+                flex-direction: column;
+                padding: 20px 24px 28px;
+                border-bottom: 1px solid var(--border);
+                transform: translateY(-130%);
+                transition: transform .3s ease;
+                gap: 18px;
+            }
+            .nav-links.open {
+                transform: translateY(0);
+            }
+            .burger {
+                display: flex;
+            }
+        }
+        /* HERO */
+        
+        .hero {
+            padding: 88px 0 60px;
+            position: relative;
+        }
+        
+        .hero .wrap {
+            display: grid;
+            grid-template-columns: 1.05fr .95fr;
+            gap: 56px;
+            align-items: center;
+        }
+        
+        @media(max-width:920px) {
+            .hero .wrap {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @keyframes heroIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .eyebrow-none {
+            color: var(--accent);
+            font-weight: 600;
+            font-size: .95rem;
+            opacity: 0;
+            animation: heroIn .6s ease forwards;
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.3rem, 5vw, 3.6rem);
+            line-height: 1.06;
+            margin: 14px 0 20px;
+            opacity: 0;
+            animation: heroIn .6s ease .1s forwards;
+        }
+        
+        .hero p.lead {
+            color: var(--ink-soft);
+            font-size: 1.15rem;
+            max-width: 46ch;
+            margin-bottom: 32px;
+            opacity: 0;
+            animation: heroIn .6s ease .2s forwards;
+        }
+        
+        .cta-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            opacity: 0;
+            animation: heroIn .6s ease .3s forwards;
+        }
+        
+        .btn {
+            border: none;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+            font-size: .98rem;
+            padding: 14px 26px;
+            border-radius: 14px;
+            transition: transform .18s, box-shadow .18s;
+        }
+        
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 26px -14px var(--accent);
+        }
+        
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--ink);
+        }
+        
+        .btn-ghost:hover {
+            background: var(--bg-alt);
+            transform: translateY(-2px);
+        }
+        
+        .demo-panel {
+            background: radial-gradient(480px circle at var(--mx, 50%) var(--my, 20%), color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%), var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 22px;
+            min-height: 360px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .demo-panel .dots {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+        
+        .demo-panel .dots span {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: var(--border);
+        }
+        
+        #heroFeed {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: flex-end;
+            min-height: 260px;
+        }
+        
+        .bubble {
+            max-width: 80%;
+            padding: 11px 15px;
+            border-radius: 16px;
+            font-size: .92rem;
+            opacity: 0;
+            transform: translateY(6px);
+            animation: pop .35s ease forwards;
+        }
+        
+        @keyframes pop {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .bubble.user {
+            align-self: flex-end;
+            background: var(--accent);
+            color: #fff;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .bubble.bot {
+            align-self: flex-start;
+            background: var(--bg-alt);
+            border-bottom-left-radius: 4px;
+        }
+        
+        .bubble {
+            transition: transform .2s ease;
+        }
+        
+        .bubble:hover {
+            transform: scale(1.03);
+        }
+        /* REVEAL */
+        
+        .reveal {
+            opacity: 0;
+            transform: translateY(22px);
+            transition: opacity .7s ease, transform .7s ease;
+        }
+        
+        .reveal.in {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* FEATURES */
+        
+        .feat-head {
+            max-width: 56ch;
+            margin-bottom: 44px;
+        }
+        
+        .feat-head h2 {
+            font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+        }
+        
+        .feat-head p {
+            color: var(--ink-soft);
+            margin-top: 10px;
+            font-size: 1.05rem;
+        }
+        
+        .feat-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 20px;
+        }
+        
+        @media(max-width:820px) {
+            .feat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .feat-card {
+            border-radius: var(--radius);
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+            transition: transform .3s ease, box-shadow .3s ease;
+        }
+        
+        .feat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+        }
+        
+        .feat-card .feat-tag {
+            display: inline-block;
+            transition: transform .35s ease;
+        }
+        
+        .feat-card:hover .feat-tag {
+            transform: scale(1.25) rotate(-8deg);
+        }
+        
+        .feat-card.big {
+            grid-row: span 2;
+            background: var(--ink);
+            color: #F1EEFB;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            min-height: 340px;
+        }
+        
+         :root[data-theme="dark"] .feat-card.big {
+            background: var(--accent);
+            color: #140F26;
+        }
+        
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) .feat-card.big {
+                background: var(--accent);
+                color: #140F26;
+            }
+        }
+        
+        .feat-card.small {
+            background: var(--surface);
+            border: 1px solid var(--border);
+        }
+        
+        .feat-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 8px;
+        }
+        
+        .feat-card p {
+            color: currentColor;
+            opacity: .8;
+            font-size: .96rem;
+            max-width: 38ch;
+        }
+        
+        .feat-card.small p {
+            color: var(--ink-soft);
+            opacity: 1;
+        }
+        
+        .feat-tag {
+            position: absolute;
+            top: 28px;
+            right: 28px;
+            font-size: 2rem;
+        }
+        /* DEMO SECTION */
+        
+        .try-shell {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .try-top {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3BD671;
+            box-shadow: 0 0 0 4px rgba(59, 214, 113, .25);
+        }
+        
+        #chatFeed {
+            height: 340px;
+            overflow-y: auto;
+            padding: 22px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .typing {
+            align-self: flex-start;
+            background: var(--bg-alt);
+            padding: 12px 16px;
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            display: flex;
+            gap: 4px;
+        }
+        
+        .typing span {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--ink-soft);
+            animation: blink 1.2s infinite;
+        }
+        
+        .typing span:nth-child(2) {
+            animation-delay: .2s;
+        }
+        
+        .typing span:nth-child(3) {
+            animation-delay: .4s;
+        }
+        
+        @keyframes blink {
+            0%,
+            80%,
+            100% {
+                opacity: .25;
+            }
+            40% {
+                opacity: 1;
+            }
+        }
+        
+        .chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 0 24px 16px;
+        }
+        
+        .chip {
+            border: 1px solid var(--border);
+            background: var(--bg-alt);
+            padding: 8px 14px;
+            border-radius: 100px;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: background .2s;
+        }
+        
+        .chip:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+        
+        .try-input {
+            display: flex;
+            gap: 10px;
+            padding: 16px 24px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .try-input input {
+            flex: 1;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--ink);
+            border-radius: 14px;
+            padding: 13px 16px;
+            font-family: inherit;
+            font-size: .95rem;
+        }
+        
+        .try-input input:focus {
+            outline: 2px solid var(--accent);
+            outline-offset: 1px;
+        }
+        
+        .try-input button {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            padding: 0 20px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        /* STEPS */
+        
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        
+        @media(max-width:780px) {
+            .steps {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .step {
+            position: relative;
+            padding: 16px;
+            margin: -16px;
+            border-radius: 16px;
+            transition: transform .25s ease, background .25s ease;
+        }
+        
+        .step:hover {
+            transform: translateY(-5px);
+            background: var(--bg-alt);
+        }
+        
+        .step .num {
+            font-family: 'Bricolage Grotesque';
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--accent);
+            opacity: .35;
+            transition: opacity .25s ease;
+        }
+        
+        .step:hover .num {
+            opacity: 1;
+        }
+        
+        .step h3 {
+            margin: 6px 0 8px;
+            font-size: 1.15rem;
+        }
+        
+        .step p {
+            color: var(--ink-soft);
+            font-size: .95rem;
+        }
+        
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 40px 0;
+            margin-top: 20px;
+        }
+        
+        footer .wrap {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .badges {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .badge {
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 5px 12px;
+            font-size: .78rem;
+            color: var(--ink-soft);
+            transition: background .2s ease, color .2s ease, transform .2s ease;
+        }
+        
+        .badge:hover {
+            background: var(--accent);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+        
+        .fine {
+            color: var(--ink-soft);
+            font-size: .85rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <nav class="wrap">
+            <div class="logo"><span class="logo-dot"></span>Aria</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#how">How it works</a></li>
+                <li><a href="#try">Try Aria</a></li>
+            </ul>
+            <div style="display:flex; gap:10px;">
+                <button class="icon-btn" id="themeBtn" aria-label="Toggle theme">🌙</button>
+                <button class="icon-btn burger" id="burgerBtn" aria-label="Menu">☰</button>
+            </div>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="wrap">
+            <div>
+                <div class="eyebrow-none">A CSE4200 web programming project</div>
+                <h1>Ask once. Aria gets it done.</h1>
+                <p class="lead">Aria is a browser-based virtual assistant that turns plain-language requests into reminders, quick answers, and next steps — no install, no account, no waiting.</p>
+                <div class="cta-row">
+                    <button class="btn btn-primary" onclick="document.getElementById('try').scrollIntoView()">Try Aria now</button>
+                    <button class="btn btn-ghost" onclick="document.getElementById('features').scrollIntoView()">See what it does</button>
+                </div>
+            </div>
+            <div class="demo-panel" id="demoPanel">
+                <div class="dots"><span></span><span></span><span></span></div>
+                <div id="heroFeed"></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features">
+        <div class="wrap">
+            <div class="feat-head reveal">
+                <h2>Built to actually help, not just chat</h2>
+                <p>Three things Aria focuses on doing well, instead of trying to do everything.</p>
+            </div>
+            <div class="feat-grid reveal">
+                <div class="feat-card big">
+                    <span class="feat-tag">💬</span>
+                    <h3>Understands plain language</h3>
+                    <p>Type a request the way you'd say it to a person. Aria matches intent instantly, without menus or commands to memorize.</p>
+                </div>
+                <div class="feat-card small">
+                    <span class="feat-tag">🧠</span>
+                    <h3>Follows the conversation</h3>
+                    <p>Follow-up questions carry context from earlier in the chat, so you're never repeating yourself.</p>
+                </div>
+                <div class="feat-card small">
+                    <span class="feat-tag">⚡</span>
+                    <h3>Runs anywhere, instantly</h3>
+                    <p>Pure front-end — HTML, CSS, and JavaScript. Opens in a tab and responds with zero load time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="how">
+        <div class="wrap">
+            <div class="feat-head reveal">
+                <h2>How a request becomes an answer</h2>
+                <p>Every message follows the same three-part path.</p>
+            </div>
+            <div class="steps reveal">
+                <div class="step">
+                    <div class="num">01</div>
+                    <h3>Ask</h3>
+                    <p>Type what you need in your own words — a reminder, a question, a quick task.</p>
+                </div>
+                <div class="step">
+                    <div class="num">02</div>
+                    <h3>Understand</h3>
+                    <p>Aria matches your message to an intent and pulls out the details that matter.</p>
+                </div>
+                <div class="step">
+                    <div class="num">03</div>
+                    <h3>Respond</h3>
+                    <p>You get an instant reply, right in the same window — no page reload.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="try">
+        <div class="wrap">
+            <div class="feat-head reveal">
+                <h2>Try it yourself</h2>
+                <p>This is a fully working demo — type a message below.</p>
+            </div>
+            <div class="try-shell reveal">
+                <div class="try-top"><span class="live-dot"></span>Aria is online</div>
+                <div id="chatFeed"></div>
+                <div class="chips">
+                    <div class="chip" data-msg="Set a reminder for 6pm">Set a reminder</div>
+                    <div class="chip" data-msg="What's the weather like?">Check the weather</div>
+                    <div class="chip" data-msg="What time is it?">What time is it?</div>
+                    <div class="chip" data-msg="Tell me a fun fact">Fun fact</div>
+                </div>
+                <form class="try-input" id="chatForm">
+                    <input id="chatInput" type="text" placeholder="Ask Aria anything…" autocomplete="off">
+                    <button type="submit">Send</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="wrap">
+            <div class="fine">Prototype built for CSE4200 · Front-end only, no server required</div>
+            <div class="badges">
+                <span class="badge">HTML</span><span class="badge">CSS</span><span class="badge">JavaScript</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        try {
+            var saved = localStorage.getItem('aria-theme');
+            if (saved) document.documentElement.setAttribute('data-theme', saved);
+        } catch (e) {}
+
+        function currentIsDark() {
+            var attr = document.documentElement.getAttribute('data-theme');
+            if (attr === 'dark') return true;
+            if (attr === 'light') return false;
+            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+
+        function paintThemeBtn() {
+            document.getElementById('themeBtn').textContent = currentIsDark() ? '☀️' : '🌙';
+        }
+        paintThemeBtn();
+        document.getElementById('themeBtn').addEventListener('click', function() {
+            var next = currentIsDark() ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', next);
+            try {
+                localStorage.setItem('aria-theme', next);
+            } catch (e) {}
+            paintThemeBtn();
+        });
+        document.getElementById('burgerBtn').addEventListener('click', function() {
+            document.getElementById('navLinks').classList.toggle('open');
+        });
+        document.querySelectorAll('.nav-links a').forEach(function(a) {
+            a.addEventListener('click', function() {
+                document.getElementById('navLinks').classList.remove('open');
+            });
+        });
+
+        /* mouse-follow glow on hero panel */
+        var panel = document.getElementById('demoPanel');
+        panel.addEventListener('mousemove', function(e) {
+            var r = panel.getBoundingClientRect();
+            panel.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+            panel.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+        });
+
+        /* scroll reveal */
+        var obs = new IntersectionObserver(function(entries) {
+            entries.forEach(function(en) {
+                if (en.isIntersecting) en.target.classList.add('in');
+            });
+        }, {
+            threshold: 0.15
+        });
+        document.querySelectorAll('.reveal').forEach(function(el) {
+            obs.observe(el);
+        });
+
+        /* hero looping scripted demo */
+        var heroScript = [
+            ['user', "Remind me to call the study group at 6"],
+            ['bot', "Done — reminder set for 6:00 PM: “Call the study group.” ✅"],
+            ['user', "What about tomorrow's weather?"],
+            ['bot', "Looks clear and mild tomorrow — good day to present outside. ☀️"]
+        ];
+        var heroFeed = document.getElementById('heroFeed');
+
+        function playHero() {
+            heroFeed.innerHTML = '';
+            var i = 0;
+
+            function step() {
+                if (i >= heroScript.length) return; /* play once, then stop */
+                var b = document.createElement('div');
+                b.className = 'bubble ' + heroScript[i][0];
+                b.textContent = heroScript[i][1];
+                heroFeed.appendChild(b);
+                i++;
+                setTimeout(step, 1000);
+            }
+            step();
+        }
+        playHero();
+
+        /* functional chat demo */
+        var feed = document.getElementById('chatFeed');
+
+        function addBubble(text, who) {
+            var b = document.createElement('div');
+            b.className = 'bubble ' + who;
+            b.style.alignSelf = who === 'user' ? 'flex-end' : 'flex-start';
+            b.style.maxWidth = '80%';
+            if (who === 'user') {
+                b.style.background = 'var(--accent)';
+                b.style.color = '#fff';
+                b.style.borderBottomRightRadius = '4px';
+            } else {
+                b.style.background = 'var(--bg-alt)';
+                b.style.borderBottomLeftRadius = '4px';
+            }
+            b.style.padding = '11px 15px';
+            b.style.borderRadius = '16px';
+            b.style.fontSize = '.92rem';
+            b.textContent = text;
+            feed.appendChild(b);
+            feed.scrollTop = feed.scrollHeight;
+        }
+
+        function reply(msg) {
+            var m = msg.toLowerCase();
+            if (/hi|hello|hey/.test(m)) return "Hi! I'm Aria — ask me to set a reminder, check the weather, or just chat.";
+            if (/remind/.test(m)) return "Got it — reminder set. (In a full build, this would sync to your calendar.) ✅";
+            if (/weather/.test(m)) return "It's clear and 72°F right now — good conditions for a walk outside. ☀️";
+            if (/time/.test(m)) return "Right now it's " + new Date().toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit'
+            }) + ".";
+            if (/fact|fun/.test(m)) return "Here's one: the first chatbot, ELIZA, was built back in 1966 — Aria has a long family tree. 🌳";
+            if (/who are you|what are you/.test(m)) return "I'm Aria, a virtual assistant prototype — built to show how natural language can trigger real actions.";
+            if (/thank/.test(m)) return "Anytime! Let me know if there's anything else.";
+            return "I'm still learning that one — try asking me for a reminder, the weather, the time, or a fun fact.";
+        }
+
+        function sendMsg(text) {
+            text = text.trim();
+            if (!text) return;
+            addBubble(text, 'user');
+            var typ = document.createElement('div');
+            typ.className = 'typing';
+            typ.innerHTML = '<span></span><span></span><span></span>';
+            feed.appendChild(typ);
+            feed.scrollTop = feed.scrollHeight;
+            setTimeout(function() {
+                typ.remove();
+                addBubble(reply(text), 'bot');
+            }, 700 + Math.random() * 500);
+        }
+        document.getElementById('chatForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            var inp = document.getElementById('chatInput');
+            sendMsg(inp.value);
+            inp.value = '';
+        });
+        document.querySelectorAll('.chip').forEach(function(c) {
+            c.addEventListener('click', function() {
+                sendMsg(c.getAttribute('data-msg'));
+            });
+        });
+        addBubble("Hi! I'm Aria. Ask me to set a reminder, check the weather, or tell you the time.", 'bot');
+    </script>
+</body>
+
+</html>
